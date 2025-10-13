@@ -34,3 +34,8 @@ build/
 
 ### Env ###
 .env
+
+### Log ###
+log/
+var/log/bookstore/
+*.log
