@@ -4,7 +4,7 @@ spring:
 
   # Default profile
   profiles:
-    active: ${SPRING_PROFILES_ACTIVE}
+    active: ${SPRING_PROFILES_ACTIVE:dev}
 
   # Common JPA configs for all profiles
   jpa:
@@ -29,7 +29,7 @@ logging:
 # JWT global configurations
 jwt:
   secret: ${JWT_SECRET:secret}
-  expiration: 86400000  # 1 day in ms
+  expiration: ${JWT_EXPIRATION:8640000}
 
 server:
-  port: ${SERVER_PORT}
+  port: ${SERVER_PORT:8080}
