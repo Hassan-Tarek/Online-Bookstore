@@ -5,27 +5,30 @@ WORKDIR /app
 
 # Copy pom.xml and download dependencies
 COPY pom.xml .
-RUN mvn dependency:go-offline -B
+RUN mvn -B -ntp dependency:go-offline -B
 
 # Copy src and build the app
 COPY src ./src
-RUN mvn clean package -DskipTests
+RUN mvn -B -ntp clean package -DskipTests
 
 # -------------------- RUNTIME STAGE --------------------
-FROM openjdk:21-jdk
+FROM eclipse-temurin:21-jre
 
 WORKDIR /app
 
 # Copy jar file from builder
 COPY --from=builder /app/target/*.jar app.jar
 
-# Expose the application port (default to 8080)
+# Default build-time args
 ARG SERVER_PORT=8080
-ENV SERVER_PORT=${SERVER_PORT}
-EXPOSE ${SERVER_PORT}
+ARG SPRING_PROFILES_ACTIVE=dev
 
-# Environment Variables
-ENV SPRING_PROFILES_ACTIVE=prod
+# Runtime environment
+ENV SERVER_PORT=$SERVER_PORT
+ENV SPRING_PROFILES_ACTIVE=$SPRING_PROFILES_ACTIVE
+
+# Expose the application port (default to 8080)
+EXPOSE ${SERVER_PORT}
 
 # Run the application
 ENTRYPOINT [ "java", "-jar", "app.jar" ]
