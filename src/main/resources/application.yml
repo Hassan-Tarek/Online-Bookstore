@@ -17,6 +17,12 @@ spring:
         show_sql: false
         dialect: org.hibernate.dialect.MySQLDialect
 
+  flyway:
+    enabled: true
+    baseline-on-migration: true
+    locations: classpath:db/migration
+    clean-disabled: false
+
 # Common logging
 logging:
   level:

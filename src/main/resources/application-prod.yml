@@ -17,6 +17,10 @@ spring:
       hibernate:
         format_sql: false
 
+  flyway:
+    schema: ${DB_NAME_PROD}
+    clean-disabled: true
+
 logging:
   level:
     root: INFO
