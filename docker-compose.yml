@@ -31,6 +31,9 @@ services:
       - SERVER_PORT=${SERVER_PORT}
     ports:
       - "${SERVER_PORT}:${SERVER_PORT}"
+    volumes:
+      - ./logs:/app/logs
+      - /var/log/bookstore:/var/log/bookstore
     networks:
       - bookstore-network
     
