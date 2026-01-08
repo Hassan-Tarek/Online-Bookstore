@@ -1,3 +1,125 @@
+server:
+  port: ${SERVER_PORT:8080}
+
 spring:
   application:
-    name: Online-Bookstore
+    name: online-bookstore
+
+  datasource:
+    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      pool-name: HikariStore
+      maximum-pool-size: 30
+      minimum-idle: 5
+      idle-timeout: 30000
+      connection-timeout: 30000
+      max-lifetime: 1800000
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+    schemas: ${DB_SCHEMA:public}
+
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      ssl:
+        enabled: ${REDIS_SSL_ENABLED:false}
+
+  rabbitmq:
+    host: ${RABBITMQ_HOST}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USERNAME}
+    password: ${RABBITMQ_PASSWORD}
+    virtual-host: ${RABBITMQ_VHOST:/}
+    ssl:
+      enabled: ${RABBITMQ_SSL_ENABLED:false}
+    publisher-confirm-type: correlated
+    template:
+      mandatory: true
+
+  mail:
+    host: ${MAIL_HOST}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail.smtp:
+        auth: true
+        starttls.enable: true
+        connectiontimeout: 5000
+        timeout: 5000
+        writetimeout: 5000
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+logging:
+  level:
+    root: INFO
+    org.springframework: INFO
+    org.hibernate.SQL: WARN
+    org.flywaydb: INFO
+
+app:
+  security:
+    jwt:
+      secret-key: ${JWT_SECRET_KEY}
+      access-expiration: ${JWT_ACCESS_EXPIRATION:3600000}
+      refresh-expiration: ${JWT_REFRESH_EXPIRATION:604800000}
+
+  integration:
+    stripe:
+      public-key: ${STRIPE_PUBLIC_KEY}
+      secret-key: ${STRIPE_SECRET_KEY}
+      webhook-secret: ${STRIPE_WEBHOOK_SECRET}
+      currency: ${STRIPE_CURRENCY:usd}
+
+    cloudinary:
+      cloud-name: ${CLOUDINARY_CLOUD_NAME}
+      api-key: ${CLOUDINARY_API_KEY}
+      api-secret: ${CLOUDINARY_API_SECRET}
+      folder: ${CLOUDINARY_FOLDER:bookstore}
+
+  messaging:
+    exchanges:
+      orders: ${APP_EXCHANGE_ORDERS:orders.exchange}
+      payments: ${APP_EXCHANGE_PAYMENTS:payments.exchange}
+
+    queues:
+      orders:
+        created: ${APP_QUEUE_ORDER_CREATED:orders.created.queue}
+        cancelled: ${APP_QUEUE_ORDER_CANCELLED:orders.cancelled.queue}
+      payments:
+        succeeded: ${APP_QUEUE_PAYMENT_SUCCEEDED:payments.succeeded.queue}
+        failed: ${APP_QUEUE_PAYMENT_FAILED:payments.failed.queue}
+
+    routing-keys:
+      orders:
+        created: ${APP_ROUTING_KEY_ORDER_CREATED:orders.created}
+        cancelled: ${APP_ROUTING_KEY_ORDER_CANCELLED:orders.cancelled}
+      payments:
+        succeeded: ${APP_ROUTING_KEY_PAYMENT_SUCCEEDED:payments.succeeded}
+        failed: ${APP_ROUTING_KEY_PAYMENT_FAILED:payments.failed}
