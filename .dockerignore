@@ -1,0 +1,24 @@
+# Maven / Gradle build artifacts
+target/
+build/
+
+# IDE files
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment variables
+.env
+
+# Git files
+.git
+.gitignore
