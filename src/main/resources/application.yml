@@ -1,3 +1,118 @@
+server:
+  port: ${SERVER_PORT:8080}
+
 spring:
   application:
-    name: Online-Bookstore
+    name: online-bookstore
+
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:postgres}:${DB_PORT:5432}/${DB_NAME:bookstore}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      pool-name: Hikari
+      maximum-pool-size: 30
+      minimum-idle: 5
+      idle-timeout: 30000
+      connection-timeout: 30000
+      max-lifetime: 1800000
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+    schemas: ${DB_SCHEMA:public}
+
+  data:
+    redis:
+      host: ${REDIS_HOST:redis}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      ssl:
+        enabled: ${REDIS_SSL_ENABLED:false}
+
+  rabbitmq:
+    host: ${RABBITMQ_HOST:rabbitmq}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USERNAME:guest}
+    password: ${RABBITMQ_PASSWORD:guest}
+    virtual-host: ${RABBITMQ_VHOST:/}
+    listener:
+      simple:
+        retry:
+          enabled: true
+          initial-interval: 3s
+          max-retries: 3
+
+  mail:
+    host: ${MAIL_HOST}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail.smtp:
+        auth: true
+        starttls:
+          enable: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+logging:
+  level:
+    root: INFO
+    com.bookstore: DEBUG
+    org.springframework.security: INFO
+
+app:
+  urls:
+    frontend: ${FRONTEND_URL:http://localhost:3000}
+
+  security:
+    cors:
+      origins: ${CORS_ORIGINS:http://localhost:3000}
+      methods: GET,POST,PUT,DELETE,PATCH
+
+    jwt:
+      secret-key: ${JWT_SECRET_KEY}
+      access-token-ttl: ${JWT_ACCESS_EXPIRATION:1h}
+      refresh-token-ttl: ${JWT_REFRESH_EXPIRATION:7d}
+      refresh-token-cookie:
+        name: ${COOKIE_NAME:refresh_token}
+        domain: ${COOKIE_DOMAIN:localhost}
+        secure: ${COOKIE_SECURE:false}
+        same-site: ${COOKIE_SAME_SITE:Strict}
+        path: ${COOKIE_PATH:/api/v1/auth/refresh}
+        max-age: ${COOKIE_MAX_AGE:7d}
+
+  integration:
+    stripe:
+      secret-key: ${STRIPE_SECRET_KEY}
+      webhook-secret: ${STRIPE_WEBHOOK_SECRET}
+
+    cloudinary:
+      cloud-name: ${CLOUDINARY_CLOUD_NAME}
+      api-key: ${CLOUDINARY_API_KEY}
+      api-secret: ${CLOUDINARY_API_SECRET}
+
+  messaging:
+    exchange: ${MESSAGING_EXCHANGE:bookstore.exchange}
+    queue: ${MESSAGING_QUEUE:bookstore.email.queue}
+    routing-key: ${MESSAGING_ROUTING_KEY:bookstore.email.routing-key}
