@@ -19,8 +19,14 @@ WORKDIR /app
 # Copy jar file from builder
 COPY --from=builder /app/target/*.jar app.jar
 
+ENV SERVER_PORT=8080
+
 # Expose the application port (default to 8080)
-EXPOSE 8080
+EXPOSE ${SERVER_PORT}
+
+# Healthcheck
+HEALTHCHECK --interval=10s --timeout=5s --retries=3 --start-period=40s \
+    CMD "wget --no-verbose -q --spider http://localhost:${SERVER_PORT}/actuator/health"
 
 # Run the application
 ENTRYPOINT ["java", "-jar", "app.jar"]
