@@ -80,6 +80,9 @@ public class SecurityConfig {
                                 "/api/v1/auth/password/reset",
                                 "/api/v1/auth/refresh").permitAll()
                         .requestMatchers("/api/v1/auth/logout").authenticated()
+                        .requestMatchers("/api/v1/users/me/**").authenticated()
+                        .requestMatchers("/api/v1/users/**").hasRole("ADMIN")
+                        .requestMatchers("/api/v1/addresses/**").authenticated()
                         .requestMatchers("/api/v1/notifications/**").authenticated()
                         .anyRequest().authenticated())
                 .sessionManagement(sessionManagement ->
