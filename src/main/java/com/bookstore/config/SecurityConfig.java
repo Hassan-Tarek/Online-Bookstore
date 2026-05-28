@@ -84,6 +84,13 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/users/**").hasRole("ADMIN")
                         .requestMatchers("/api/v1/addresses/**").authenticated()
                         .requestMatchers("/api/v1/notifications/**").authenticated()
+                        .requestMatchers("/api/v1/authors", "/api/v1/authors/*").permitAll()
+                        .requestMatchers(
+                                "/api/v1/authors/following",
+                                "/api/v1/authors/*/follow",
+                                "/api/v1/authors/*/unfollow"
+                        ).authenticated()
+                        .requestMatchers("/api/v1/authors/**").hasRole("ADMIN")
                         .anyRequest().authenticated())
                 .sessionManagement(sessionManagement ->
                         sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
