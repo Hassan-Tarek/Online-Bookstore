@@ -1,0 +1,95 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: bookstore-postgres
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - bookstore-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME} -d ${DB_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+
+#  pgadmin:
+#    image: dpage/pgadmin4:9.11
+#    container_name: pgadmin
+#    restart: unless-stopped
+#    depends_on:
+#      postgres:
+#        condition: service_healthy
+#    env_file:
+#      - .env
+#    environment:
+#      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+#      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+#    ports:
+#      - "5050:80"
+#    volumes:
+#      - pgadmin_data:/var/lib/pgadmin
+#    networks:
+#      - bookstore-network
+
+  redis:
+    image: redis:7.4-alpine
+    container_name: bookstore-redis
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    networks:
+      - bookstore-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: bookstore-app
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    env_file:
+      - .env
+    ports:
+      - "${SERVER_PORT:-8080}:${SERVER_PORT:-8080}"
+    volumes:
+      - ./logs:/var/log
+    networks:
+      - bookstore-network
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:${SERVER_PORT}/actuator/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+
+networks:
+  bookstore-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local
+  pgadmin_data:
+    driver: local
