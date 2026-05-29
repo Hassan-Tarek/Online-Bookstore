@@ -1,10 +1,11 @@
 package com.bookstore.controller.catalog;
 
-import com.bookstore.dto.catalog.request.SeriesCreateRequest;
-import com.bookstore.dto.catalog.request.SeriesUpdateRequest;
+import com.bookstore.dto.catalog.request.BookCreateRequest;
+import com.bookstore.dto.catalog.request.BookSearchCriteria;
+import com.bookstore.dto.catalog.request.BookUpdateRequest;
+import com.bookstore.dto.catalog.response.BookResponse;
 import com.bookstore.dto.catalog.response.BookSummaryResponse;
-import com.bookstore.dto.catalog.response.SeriesResponse;
-import com.bookstore.service.catalog.SeriesService;
+import com.bookstore.service.catalog.BookService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -14,7 +15,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -28,79 +28,87 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.UUID;
 
 @RestController
-@RequestMapping(path = "/api/v1/series",
+@RequestMapping(path = "/api/v1/books",
         produces = "application/json")
 @RequiredArgsConstructor
-public class SeriesController {
+public class BookController {
 
-    private final SeriesService seriesService;
+    private final BookService bookService;
 
-    @GetMapping
+    @GetMapping(path = "/search")
     @PreAuthorize("permitAll()")
-    public ResponseEntity<Page<SeriesResponse>> getAllSeries(
+    public ResponseEntity<Page<BookSummaryResponse>> searchBooks(
+            BookSearchCriteria criteria,
             Pageable pageable) {
-        var responses = seriesService.getAllSeries(pageable);
+        var responses = bookService.searchBooks(criteria, pageable);
+        return ResponseEntity.ok(responses);
+    }
+
+    @GetMapping(path = "/top-rated")
+    @PreAuthorize("permitAll()")
+    public ResponseEntity<Page<BookSummaryResponse>> getTopRatedBooks(
+            Pageable pageable) {
+        var responses = bookService.getTopRatedBooks(pageable);
+        return ResponseEntity.ok(responses);
+    }
+
+    @GetMapping(path = "/new-releases")
+    @PreAuthorize("permitAll()")
+    public ResponseEntity<Page<BookSummaryResponse>> getNewReleaseBooks(
+            Pageable pageable) {
+        var responses = bookService.getNewReleases(pageable);
         return ResponseEntity.ok(responses);
     }
 
     @GetMapping(path = "/{id}")
     @PreAuthorize("permitAll()")
-    public ResponseEntity<SeriesResponse> getSeries(
+    public ResponseEntity<BookResponse> getBookById(
             @PathVariable UUID id) {
-        var response = seriesService.getSeriesById(id);
+        var response = bookService.getBookById(id);
         return ResponseEntity.ok(response);
-    }
-
-    @GetMapping(path = "/{id}/books")
-    @PreAuthorize("permitAll()")
-    public ResponseEntity<Page<BookSummaryResponse>> getSeriesBooks(
-            @PathVariable UUID id,
-            Pageable pageable) {
-        var responses = seriesService.getSeriesBooks(id, pageable);
-        return ResponseEntity.ok(responses);
     }
 
     @PostMapping(consumes = "multipart/form-data")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<SeriesResponse> createSeries(
-            @RequestPart(value = "data") @Valid SeriesCreateRequest request,
+    public ResponseEntity<BookResponse> createBook(
+            @Valid @RequestPart(value = "data") BookCreateRequest request,
             @RequestPart(value = "image", required = false) MultipartFile coverImage) {
-        var response = seriesService.createSeries(request, coverImage);
+        var response = bookService.createBook(request, coverImage);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @PatchMapping(path = "/{id}")
+    @PutMapping(path = "/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<SeriesResponse> updateSeries(
+    public ResponseEntity<BookResponse> updateBook(
             @PathVariable UUID id,
-            @Valid @RequestBody SeriesUpdateRequest request) {
-        var response = seriesService.updateSeries(id, request);
+            @Valid @RequestBody BookUpdateRequest request) {
+        var response = bookService.updateBook(id, request);
         return ResponseEntity.ok(response);
     }
 
     @PutMapping(path = "/{id}/cover-image",
             consumes = "multipart/form-data")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<SeriesResponse> updateSeriesCoverImage(
+    public ResponseEntity<BookResponse> updateBookCoverImage(
             @PathVariable UUID id,
             @RequestParam MultipartFile coverImage) {
-        var response = seriesService.updateSeriesCoverImage(id, coverImage);
+        var response = bookService.updateBookCoverImage(id, coverImage);
         return ResponseEntity.ok(response);
     }
 
     @DeleteMapping(path = "/{id}/cover-image")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> deleteSeriesCoverImage(
+    public ResponseEntity<Void> deleteBookCoverImage(
             @PathVariable UUID id) {
-        seriesService.deleteSeriesCoverImage(id);
+        bookService.deleteBookCoverImage(id);
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping(path = "/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> deleteSeries(
+    public ResponseEntity<Void> deleteBook(
             @PathVariable UUID id) {
-        seriesService.deleteSeries(id);
+        bookService.deleteBook(id);
         return ResponseEntity.noContent().build();
     }
 }

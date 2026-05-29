@@ -2,6 +2,7 @@ package com.bookstore.controller.catalog;
 
 import com.bookstore.dto.catalog.request.CategoryCreateRequest;
 import com.bookstore.dto.catalog.request.CategoryUpdateRequest;
+import com.bookstore.dto.catalog.response.BookSummaryResponse;
 import com.bookstore.dto.catalog.response.CategoryResponse;
 import com.bookstore.service.catalog.CategoryService;
 import jakarta.validation.Valid;
@@ -43,6 +44,15 @@ public class CategoryController {
             @PathVariable UUID id) {
         var response = categoryService.getCategoryById(id);
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping(path = "/{id}/books")
+    @PreAuthorize("permitAll()")
+    public ResponseEntity<Page<BookSummaryResponse>> getCategoryBooks(
+            @PathVariable UUID id,
+            Pageable pageable) {
+        var responses = categoryService.getCategoryBooks(id, pageable);
+        return ResponseEntity.ok(responses);
     }
 
     @PostMapping

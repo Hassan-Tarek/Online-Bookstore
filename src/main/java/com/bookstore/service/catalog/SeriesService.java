@@ -2,10 +2,13 @@ package com.bookstore.service.catalog;
 
 import com.bookstore.dto.catalog.request.SeriesCreateRequest;
 import com.bookstore.dto.catalog.request.SeriesUpdateRequest;
+import com.bookstore.dto.catalog.response.BookSummaryResponse;
 import com.bookstore.dto.catalog.response.SeriesResponse;
 import com.bookstore.entity.catalog.Series;
 import com.bookstore.exception.ResourceNotFoundException;
+import com.bookstore.mapper.catalog.BookMapper;
 import com.bookstore.mapper.catalog.SeriesMapper;
+import com.bookstore.repository.catalog.BookRepository;
 import com.bookstore.repository.catalog.SeriesRepository;
 import com.bookstore.service.storage.CloudinaryService;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +26,9 @@ import java.util.UUID;
 public class SeriesService {
 
     private final SeriesRepository seriesRepository;
+    private final BookRepository bookRepository;
     private final SeriesMapper seriesMapper;
+    private final BookMapper bookMapper;
     private final CloudinaryService cloudinaryService;
 
     @Transactional(readOnly = true)
@@ -37,6 +42,15 @@ public class SeriesService {
         Series series = seriesRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Series with id " + id + " not found"));
         return seriesMapper.toResponse(series);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<BookSummaryResponse> getSeriesBooks(UUID id, Pageable pageable) {
+        if (!seriesRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Series with id " + id + " not found");
+        }
+        return bookRepository.findAllBySeriesId(id, pageable)
+                .map(bookMapper::toSummaryResponse);
     }
 
     @Transactional

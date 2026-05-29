@@ -96,6 +96,11 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/categories/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/v1/series/**").permitAll()
                         .requestMatchers("/api/v1/series/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/books/**").permitAll()
+                        .requestMatchers("/api/v1/books/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/books/*/reviews").authenticated()
+                        .requestMatchers("/api/v1/reviews/**").authenticated()
+                        .requestMatchers("/api/v1/inventories/**").hasRole("ADMIN")
                         .anyRequest().authenticated())
                 .sessionManagement(sessionManagement ->
                         sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

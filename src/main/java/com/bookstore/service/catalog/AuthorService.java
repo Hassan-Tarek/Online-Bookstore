@@ -3,12 +3,15 @@ package com.bookstore.service.catalog;
 import com.bookstore.dto.catalog.request.AuthorCreateRequest;
 import com.bookstore.dto.catalog.request.AuthorUpdateRequest;
 import com.bookstore.dto.catalog.response.AuthorResponse;
+import com.bookstore.dto.catalog.response.BookSummaryResponse;
 import com.bookstore.entity.catalog.Author;
 import com.bookstore.entity.user.User;
 import com.bookstore.exception.BadRequestException;
 import com.bookstore.exception.ResourceNotFoundException;
 import com.bookstore.mapper.catalog.AuthorMapper;
+import com.bookstore.mapper.catalog.BookMapper;
 import com.bookstore.repository.catalog.AuthorRepository;
+import com.bookstore.repository.catalog.BookRepository;
 import com.bookstore.service.storage.CloudinaryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -27,6 +30,8 @@ public class AuthorService {
     private final AuthorRepository authorRepository;
     private final AuthorMapper authorMapper;
     private final CloudinaryService cloudinaryService;
+    private final BookRepository bookRepository;
+    private final BookMapper bookMapper;
 
     @Transactional(readOnly = true)
     public Page<AuthorResponse> getAllAuthors(Pageable pageable) {
@@ -39,6 +44,15 @@ public class AuthorService {
         Author author = authorRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Author with id " + id + " not found"));
         return authorMapper.toResponse(author);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<BookSummaryResponse> getAuthorBooks(UUID id, Pageable pageable) {
+        if (!authorRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Author with id " + id + " not found");
+        }
+        return bookRepository.findAllByAuthorId(id, pageable)
+                .map(bookMapper::toSummaryResponse);
     }
 
     @Transactional(readOnly = true)

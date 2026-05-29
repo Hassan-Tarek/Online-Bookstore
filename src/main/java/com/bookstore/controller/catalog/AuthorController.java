@@ -3,6 +3,7 @@ package com.bookstore.controller.catalog;
 import com.bookstore.dto.catalog.request.AuthorCreateRequest;
 import com.bookstore.dto.catalog.request.AuthorUpdateRequest;
 import com.bookstore.dto.catalog.response.AuthorResponse;
+import com.bookstore.dto.catalog.response.BookSummaryResponse;
 import com.bookstore.security.user.CustomUserDetails;
 import com.bookstore.service.catalog.AuthorService;
 import jakarta.validation.Valid;
@@ -49,6 +50,15 @@ public class AuthorController {
     public ResponseEntity<AuthorResponse> getAuthorById(
             @PathVariable UUID id) {
         var response = authorService.getAuthor(id);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping(path = "/{id}/books")
+    @PreAuthorize("permitAll()")
+    public ResponseEntity<Page<BookSummaryResponse>> getAuthorBooks(
+            @PathVariable UUID id,
+            Pageable pageable) {
+        var response = authorService.getAuthorBooks(id, pageable);
         return ResponseEntity.ok(response);
     }
 
