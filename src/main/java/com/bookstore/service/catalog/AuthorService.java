@@ -64,8 +64,7 @@ public class AuthorService {
         if (!authorRepository.existsById(id)) {
             throw new ResourceNotFoundException("Author with id " + id + " not found");
         }
-        int res = authorRepository.follow(id, user.getId());
-        if (res > 0) {
+        if (authorRepository.follow(id, user.getId()) > 0) {
             authorRepository.incrementFollowersCount(id);
         } else {
             throw new BadRequestException("You are already following this author.");
@@ -78,8 +77,7 @@ public class AuthorService {
         if (!authorRepository.existsById(id)) {
             throw new ResourceNotFoundException("Author with id " + id + " not found");
         }
-        int res = authorRepository.unfollow(id, user.getId());
-        if (res > 0) {
+        if (authorRepository.unfollow(id, user.getId()) > 0) {
             authorRepository.decrementFollowersCount(id);
         } else {
             throw new BadRequestException("You are not following this author.");

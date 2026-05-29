@@ -4,6 +4,7 @@ import com.bookstore.security.jwt.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -91,6 +92,10 @@ public class SecurityConfig {
                                 "/api/v1/authors/*/unfollow"
                         ).authenticated()
                         .requestMatchers("/api/v1/authors/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/categories/**").permitAll()
+                        .requestMatchers("/api/v1/categories/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/series/**").permitAll()
+                        .requestMatchers("/api/v1/series/**").hasRole("ADMIN")
                         .anyRequest().authenticated())
                 .sessionManagement(sessionManagement ->
                         sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
