@@ -18,6 +18,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,6 +39,7 @@ public class AuthenticationController {
     private final AppProperties appProperties;
 
     @PostMapping(path = "/register")
+    @PreAuthorize("permitAll()")
     public ResponseEntity<UserResponse> register(
             @Valid @RequestBody RegisterRequest request) {
         var response = authenticationService.register(request);
@@ -45,6 +47,7 @@ public class AuthenticationController {
     }
 
     @PostMapping(path = "/verification/resend")
+    @PreAuthorize("permitAll()")
     public ResponseEntity<Void> resendVerification(
             @Email @RequestParam(name = "email") String email) {
         authenticationService.resendVerification(email);
@@ -52,6 +55,7 @@ public class AuthenticationController {
     }
 
     @PostMapping(path = "/verify")
+    @PreAuthorize("permitAll()")
     public ResponseEntity<Void> verify(
             @RequestParam String token) {
         authenticationService.verify(token);
@@ -59,6 +63,7 @@ public class AuthenticationController {
     }
 
     @PostMapping(path = "/login")
+    @PreAuthorize("permitAll()")
     public ResponseEntity<AuthenticationResponse> login(
             @Valid @RequestBody LoginRequest request,
             HttpServletResponse response) {
@@ -68,6 +73,7 @@ public class AuthenticationController {
     }
 
     @PostMapping(path = "/password/forgot")
+    @PreAuthorize("permitAll()")
     public ResponseEntity<Void> forgotPassword(
             @Valid @RequestBody PasswordForgotRequest request) {
         authenticationService.requestPasswordReset(request);
@@ -75,6 +81,7 @@ public class AuthenticationController {
     }
 
     @PostMapping(path = "/password/reset")
+    @PreAuthorize("permitAll()")
     public ResponseEntity<Void> resetPassword(
             @RequestParam(name = "token") String token,
             @Valid @RequestBody PasswordResetRequest request) {
@@ -83,6 +90,7 @@ public class AuthenticationController {
     }
 
     @PostMapping(path = "/refresh")
+    @PreAuthorize("permitAll()")
     public ResponseEntity<AuthenticationResponse> refresh(
             HttpServletRequest request,
             HttpServletResponse response) {
@@ -93,6 +101,7 @@ public class AuthenticationController {
     }
 
     @PostMapping(path = "/logout")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Void> logout(
             HttpServletRequest request,
             HttpServletResponse response) {

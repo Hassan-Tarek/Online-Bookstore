@@ -84,6 +84,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/users/me/**").authenticated()
                         .requestMatchers("/api/v1/users/**").hasRole("ADMIN")
                         .requestMatchers("/api/v1/addresses/**").authenticated()
+                        .requestMatchers("/api/v1/wishlist/**").authenticated()
                         .requestMatchers("/api/v1/notifications/**").authenticated()
                         .requestMatchers("/api/v1/authors", "/api/v1/authors/*").permitAll()
                         .requestMatchers(
@@ -101,6 +102,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/v1/books/*/reviews").authenticated()
                         .requestMatchers("/api/v1/reviews/**").authenticated()
                         .requestMatchers("/api/v1/inventories/**").hasRole("ADMIN")
+                        .requestMatchers("/api/v1/cart/**").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/promotions/**").permitAll()
+                        .requestMatchers("/api/v1/promotions/**").hasRole("ADMIN")
                         .anyRequest().authenticated())
                 .sessionManagement(sessionManagement ->
                         sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
