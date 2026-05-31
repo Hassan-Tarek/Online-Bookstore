@@ -112,6 +112,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/payments/**").authenticated()
                         .requestMatchers("/api/v1/shipments", "/api/v1/shipments/*/status").hasRole("ADMIN")
                         .requestMatchers("/api/v1/shipments/**").authenticated()
+                        .requestMatchers("/api/v1/reports/**").hasRole("ADMIN")
                         .anyRequest().authenticated())
                 .sessionManagement(sessionManagement ->
                         sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
