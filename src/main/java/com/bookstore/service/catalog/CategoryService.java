@@ -11,6 +11,8 @@ import com.bookstore.mapper.catalog.CategoryMapper;
 import com.bookstore.repository.catalog.BookRepository;
 import com.bookstore.repository.catalog.CategoryRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -34,6 +36,7 @@ public class CategoryService {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(value = "categories", key = "#id")
     public CategoryResponse getCategoryById(UUID id) {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Category with id " + id + " not found"));
@@ -57,6 +60,7 @@ public class CategoryService {
     }
 
     @Transactional
+    @CachePut(value = "categories", key = "#id")
     public CategoryResponse updateCategory(UUID id, CategoryUpdateRequest request) {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Category with id " + id + " not found"));

@@ -12,6 +12,9 @@ import com.bookstore.repository.catalog.BookRepository;
 import com.bookstore.repository.catalog.SeriesRepository;
 import com.bookstore.service.storage.CloudinaryService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -38,6 +41,7 @@ public class SeriesService {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(value = "series", key = "#id")
     public SeriesResponse getSeriesById(UUID id) {
         Series series = seriesRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Series with id " + id + " not found"));
@@ -66,6 +70,7 @@ public class SeriesService {
     }
 
     @Transactional
+    @CachePut(value = "series", key = "#id")
     public SeriesResponse updateSeries(UUID id, SeriesUpdateRequest request) {
         Series series = seriesRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Series with id " + id + " not found"));
@@ -75,6 +80,7 @@ public class SeriesService {
     }
 
     @Transactional
+    @CachePut(value = "series", key = "#id")
     public SeriesResponse updateSeriesCoverImage(UUID id, MultipartFile coverImage) {
         Series series = seriesRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Series with id " + id + " not found"));
@@ -91,6 +97,7 @@ public class SeriesService {
     }
 
     @Transactional
+    @CacheEvict(value = "series", key = "#id")
     public void deleteSeriesCoverImage(UUID id) {
         Series series = seriesRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Series with id " + id + " not found"));
@@ -103,6 +110,7 @@ public class SeriesService {
     }
 
     @Transactional
+    @CacheEvict(value = "series", key = "#id")
     public void deleteSeries(UUID id) {
         Series series = seriesRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Series with id " + id + " not found"));

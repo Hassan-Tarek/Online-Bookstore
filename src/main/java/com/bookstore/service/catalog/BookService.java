@@ -18,6 +18,9 @@ import com.bookstore.repository.catalog.SeriesRepository;
 import com.bookstore.repository.catalog.specification.BookSpecification;
 import com.bookstore.service.storage.CloudinaryService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -48,17 +51,20 @@ public class BookService {
                 .map(bookMapper::toSummaryResponse);
     }
 
+    @Transactional(readOnly = true)
     public Page<BookSummaryResponse> getTopRatedBooks(Pageable pageable) {
         return bookRepository.findTopRated(pageable)
                 .map(bookMapper::toSummaryResponse);
     }
 
+    @Transactional(readOnly = true)
     public Page<BookSummaryResponse> getNewReleases(Pageable pageable) {
         return bookRepository.findAllByOrderByPublicationDateDesc(pageable)
                 .map(bookMapper::toSummaryResponse);
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(value = "books", key = "#id")
     public BookResponse getBookById(UUID id) {
         Book book = bookRepository.findWithSeriesAndCategoriesAndAuthorsById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Book with id " + id + " not found"));
@@ -98,6 +104,7 @@ public class BookService {
     }
 
     @Transactional
+    @CachePut(value = "books", key = "#id")
     public BookResponse updateBook(UUID id, BookUpdateRequest request) {
         Book book = bookRepository.findWithSeriesAndCategoriesAndAuthorsById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Book with id " + id + " not found"));
@@ -107,6 +114,7 @@ public class BookService {
     }
 
     @Transactional
+    @CachePut(value = "books", key = "#id")
     public BookResponse updateBookCoverImage(UUID id, MultipartFile coverImage) {
         Book book = bookRepository.findWithSeriesAndCategoriesAndAuthorsById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Book with id " + id + " not found"));
@@ -122,6 +130,7 @@ public class BookService {
     }
 
     @Transactional
+    @CacheEvict(value = "books", key = "#id")
     public void deleteBookCoverImage(UUID id) {
         Book book = bookRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Book with id " + id + " not found"));
@@ -134,6 +143,7 @@ public class BookService {
     }
 
     @Transactional
+    @CacheEvict(value = "books", key = "#id")
     public void deleteBook(UUID id) {
         Book book = bookRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Book with id " + id + " not found"));

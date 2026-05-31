@@ -14,6 +14,9 @@ import com.bookstore.repository.catalog.AuthorRepository;
 import com.bookstore.repository.catalog.BookRepository;
 import com.bookstore.service.storage.CloudinaryService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -40,6 +43,7 @@ public class AuthorService {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(value = "authors", key = "#id")
     public AuthorResponse getAuthor(UUID id) {
         Author author = authorRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Author with id " + id + " not found"));
@@ -74,6 +78,7 @@ public class AuthorService {
     }
 
     @Transactional
+    @CacheEvict(value = "authors", key = "#id")
     public AuthorResponse followAuthor(UUID id, User user) {
         if (!authorRepository.existsById(id)) {
             throw new ResourceNotFoundException("Author with id " + id + " not found");
@@ -83,10 +88,12 @@ public class AuthorService {
         } else {
             throw new BadRequestException("You are already following this author.");
         }
-        return getAuthor(id);
+        Author author = authorRepository.findById(id).orElseThrow();
+        return authorMapper.toResponse(author);
     }
 
     @Transactional
+    @CacheEvict(value = "authors", key = "#id")
     public AuthorResponse unfollowAuthor(UUID id, User user) {
         if (!authorRepository.existsById(id)) {
             throw new ResourceNotFoundException("Author with id " + id + " not found");
@@ -96,10 +103,12 @@ public class AuthorService {
         } else {
             throw new BadRequestException("You are not following this author.");
         }
-        return getAuthor(id);
+        Author author = authorRepository.findById(id).orElseThrow();
+        return authorMapper.toResponse(author);
     }
 
     @Transactional
+    @CachePut(value = "authors", key = "#id")
     public AuthorResponse updateAuthor(UUID id, AuthorUpdateRequest request) {
         Author author = authorRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Author with id " + id + " not found"));
@@ -109,6 +118,7 @@ public class AuthorService {
     }
 
     @Transactional
+    @CachePut(value = "authors", key = "#id")
     public AuthorResponse updateAuthorProfileImage(UUID id, MultipartFile profileImage) {
         Author author = authorRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Author with id " + id + " not found"));
@@ -126,6 +136,7 @@ public class AuthorService {
     }
 
     @Transactional
+    @CacheEvict(value = "authors", key = "#id")
     public void deleteAuthorProfileImage(UUID id) {
         Author author = authorRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Author with id " + id + " not found"));
@@ -138,6 +149,7 @@ public class AuthorService {
     }
 
     @Transactional
+    @CacheEvict(value = "authors", key = "#id")
     public void deleteAuthor(UUID id) {
         Author author = authorRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Author with id " + id + " not found"));

@@ -45,8 +45,7 @@ spring:
 
 logging:
   file:
-    path: /var/log/
-    name: Bookstore.log
+    name: /var/log/bookstore/bookstore.log
   level:
     root: INFO
     com.bookstore: INFO

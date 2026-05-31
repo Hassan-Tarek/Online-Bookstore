@@ -56,7 +56,6 @@ app:
       password-reset: 30m
     cache:
       catalog: 1h
-      commerce: 15m
 
   security:
     cors:

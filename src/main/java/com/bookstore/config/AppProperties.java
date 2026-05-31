@@ -21,7 +21,7 @@ public record AppProperties(
     
     public record Ttl(Auth auth, Cache cache) { }
     public record Auth(Duration access, Duration refresh, Duration verification, Duration passwordReset) { }
-    public record Cache(Duration catalog, Duration commerce) { }
+    public record Cache(Duration catalog) { }
 
     public record Security(Cors cors, Jwt jwt) { }
     public record Cors(List<String> origins, List<String> methods, List<String> headers) { }
