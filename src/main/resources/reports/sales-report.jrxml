@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+              name="sales_report" pageWidth="595" pageHeight="842" columnWidth="555"
+              leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
+
+    <parameter name="startDate" class="java.time.LocalDate"/>
+    <parameter name="endDate" class="java.time.LocalDate"/>
+
+    <field name="totalOrders" class="java.lang.Long"/>
+    <field name="totalItems" class="java.lang.Long"/>
+    <field name="totalRevenue" class="java.math.BigDecimal"/>
+    <field name="averageOrderValue" class="java.math.BigDecimal"/>
+
+    <title>
+        <band height="60">
+            <staticText>
+                <reportElement x="0" y="0" width="555" height="30"/>
+                <textElement textAlignment="Center">
+                    <font size="18" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Sales Summary Report]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="0" y="35" width="555" height="20"/>
+                <textElement textAlignment="Center"/>
+                <textFieldExpression><![CDATA["Period: " + $P{startDate} + " to " + $P{endDate}]]></textFieldExpression>
+            </textField>
+        </band>
+    </title>
+
+    <columnHeader>
+        <band height="24">
+            <staticText>
+                <reportElement x="0" y="2" width="150" height="20"/>
+                <box><bottomPen lineWidth="1.0"/></box>
+                <textElement textAlignment="Left" verticalAlignment="Middle"><font isBold="true"/></textElement>
+                <text><![CDATA[totalRevenue]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="150" y="2" width="120" height="20"/>
+                <box><bottomPen lineWidth="1.0"/></box>
+                <textElement textAlignment="Center" verticalAlignment="Middle"><font isBold="true"/></textElement>
+                <text><![CDATA[totalOrders]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="270" y="2" width="130" height="20"/>
+                <box><bottomPen lineWidth="1.0"/></box>
+                <textElement textAlignment="Center" verticalAlignment="Middle"><font isBold="true"/></textElement>
+                <text><![CDATA[totalItems]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="400" y="2" width="155" height="20"/>
+                <box><bottomPen lineWidth="1.0"/></box>
+                <textElement textAlignment="Right" verticalAlignment="Middle"><font isBold="true"/></textElement>
+                <text><![CDATA[averageOrderValue]]></text>
+            </staticText>
+        </band>
+    </columnHeader>
+
+    <detail>
+        <band height="22">
+            <textField pattern="¤#,##0.00">
+                <reportElement x="0" y="0" width="150" height="20"/>
+                <textElement textAlignment="Left" verticalAlignment="Middle"/>
+                <textFieldExpression><![CDATA[$F{totalRevenue}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="150" y="0" width="120" height="20"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle"/>
+                <textFieldExpression><![CDATA[$F{totalOrders}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="270" y="0" width="130" height="20"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle"/>
+                <textFieldExpression><![CDATA[$F{totalItems}]]></textFieldExpression>
+            </textField>
+            <textField pattern="¤#,##0.00">
+                <reportElement x="400" y="0" width="155" height="20"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle"/>
+                <textFieldExpression><![CDATA[$F{averageOrderValue}]]></textFieldExpression>
+            </textField>
+        </band>
+    </detail>
+
+    <pageFooter>
+        <band height="20">
+            <textField>
+                <reportElement x="435" y="0" width="80" height="20"/>
+                <textElement textAlignment="Right"/>
+                <textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+            </textField>
+            <textField evaluationTime="Report">
+                <reportElement x="515" y="0" width="40" height="20"/>
+                <textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+            </textField>
+        </band>
+    </pageFooter>
+</jasperReport>
