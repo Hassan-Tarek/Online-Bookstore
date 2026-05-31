@@ -105,6 +105,13 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/cart/**").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/v1/promotions/**").permitAll()
                         .requestMatchers("/api/v1/promotions/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/orders").hasRole("ADMIN")
+                        .requestMatchers("/api/v1/orders/**").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/payments/webhook").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/payments").hasRole("ADMIN")
+                        .requestMatchers("/api/v1/payments/**").authenticated()
+                        .requestMatchers("/api/v1/shipments", "/api/v1/shipments/*/status").hasRole("ADMIN")
+                        .requestMatchers("/api/v1/shipments/**").authenticated()
                         .anyRequest().authenticated())
                 .sessionManagement(sessionManagement ->
                         sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

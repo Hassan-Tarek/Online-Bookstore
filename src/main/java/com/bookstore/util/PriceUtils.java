@@ -58,33 +58,15 @@ public class PriceUtils {
         };
     }
 
-    public BigDecimal calculateDiscount(BigDecimal subtotal, String promoCode) {
-        if (promoCode == null || promoCode.isBlank()) {
-            return BigDecimal.ZERO;
-        }
-
-        Promotion promotion = promotionRepository.findByCode(promoCode)
-                .orElse(null);
+    public BigDecimal calculateDiscount(BigDecimal subtotal, Promotion promotion) {
         promotionService.validateOrderPromotion(promotion, subtotal);
         return calculateDiscountValue(promotion, subtotal);
     }
 
-    public BigDecimal calculateTotal(Cart cart, ShippingMethod shippingMethod, String promoCode) {
+    public PriceSummary calculatePriceSummary(Cart cart, ShippingMethod shippingMethod, Promotion promotion) {
         BigDecimal subtotal = calculateSubtotal(cart);
         BigDecimal shippingFee = calculateShippingFee(shippingMethod);
-        BigDecimal discount = calculateDiscount(subtotal, promoCode);
-        BigDecimal tax = calculateTax(subtotal, shippingFee, discount);
-
-        return subtotal.add(shippingFee)
-                .subtract(discount)
-                .add(tax)
-                .setScale(2, RoundingMode.HALF_UP);
-    }
-
-    public PriceSummary calculatePriceSummary(Cart cart, ShippingMethod shippingMethod, String promoCode) {
-        BigDecimal subtotal = calculateSubtotal(cart);
-        BigDecimal shippingFee = calculateShippingFee(shippingMethod);
-        BigDecimal discount = calculateDiscount(subtotal, promoCode);
+        BigDecimal discount = calculateDiscount(subtotal, promotion);
         BigDecimal tax = calculateTax(subtotal, shippingFee, discount);
         BigDecimal total = subtotal.add(shippingFee).subtract(discount).add(tax)
                 .setScale(2, RoundingMode.HALF_UP);
