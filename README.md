@@ -86,7 +86,6 @@ STRIPE_WEBHOOK_SECRET=whsec_...
 CLOUDINARY_CLOUD_NAME=your_cloud
 CLOUDINARY_API_KEY=your_key
 CLOUDINARY_API_SECRET=your_secret
-CLOUDINARY_FOLDER=bookstore
 
 # Mail (production profile)
 MAIL_HOST=smtp.example.com
@@ -151,7 +150,6 @@ STRIPE_WEBHOOK_SECRET=whsec_...
 CLOUDINARY_CLOUD_NAME=dev
 CLOUDINARY_API_KEY=dev
 CLOUDINARY_API_SECRET=dev
-CLOUDINARY_FOLDER=bookstore-dev
 ```
 
 ### 4. Run the application
@@ -360,16 +358,6 @@ Hibernate `ddl-auto` is **`validate`** in dev/prod (never auto-generates schema)
 # Linux / macOS
 ./mvnw test
 ```
-
-Requires **JDK 21** and **Docker** (for integration tests). If Docker is not running, integration tests are skipped automatically; unit tests still run.
-
-| Type | Location | What they cover |
-|------|----------|-----------------|
-| **Unit** | `src/test/java/com/bookstore/**` (except `integration`) | Pricing, inventory, promotions, orders, auth logic with mocks |
-| **Integration** | `src/test/java/com/bookstore/integration/` | Full Spring context + Testcontainers (PostgreSQL 17, Redis 7) |
-
-Integration tests use the `integration` profile and exercise real HTTP flows via `MockMvc` (register → verify → login, role-based security, actuator health).
-
 ---
 
 ## Health & Monitoring
